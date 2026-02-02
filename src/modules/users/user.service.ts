@@ -18,3 +18,26 @@ export const getUserById = async (id: string) => {
 
   return user;
 };
+
+
+export const createUser = async (data: {
+  email: string;
+  name: string;
+  role?: "ADMIN" | "STAFF" | "USER";
+}) => {
+  try {
+    return await prisma.user.create({
+      data: {
+        email: data.email,
+        name: data.name,
+        role: data.role ?? "USER",
+      },
+    });
+  } catch (err: any) {
+    // Prisma unique constraint error
+    if (err.code === "P2002") {
+      throw new AppError("Email already exists", 409);
+    }
+    throw err;
+  }
+};

@@ -26,3 +26,16 @@ export const getUserById = async (
     next(err);
   }
 };
+
+export const createUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const user = await userService.createUser(req.body);
+    res.status(201).json(user);
+  } catch (err) {
+    next(err);
+  }
+};
