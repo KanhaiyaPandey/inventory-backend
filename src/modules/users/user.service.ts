@@ -1,21 +1,16 @@
+import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/AppError";
 
-type User = {
-  id: string;
-  name: string;
+export const getUsers = async () => {
+  return prisma.user.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 };
 
-const users: User[] = [
-  { id: "1", name: "Alice" },
-  { id: "2", name: "Bob" },
-];
-
-export const getUsers = async (): Promise<User[]> => {
-  return users;
-};
-
-export const getUserById = async (id: string): Promise<User> => {
-  const user = users.find((u) => u.id === id);
+export const getUserById = async (id: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+  });
 
   if (!user) {
     throw new AppError("User not found", 404);
