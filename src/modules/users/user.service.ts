@@ -1,5 +1,7 @@
 import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/AppError";
+import bcrypt from "bcrypt";
+
 
 export const getUsers = async () => {
   return prisma.user.findMany({
@@ -20,21 +22,25 @@ export const getUserById = async (id: string) => {
 };
 
 
+
 export const createUser = async (data: {
   email: string;
   name: string;
+  password: string;
   role?: "ADMIN" | "STAFF" | "USER";
 }) => {
+  const hashedPassword = await bcrypt.hash(data.password, 10);
+
   try {
     return await prisma.user.create({
       data: {
         email: data.email,
         name: data.name,
+        password: hashedPassword,
         role: data.role ?? "USER",
       },
     });
   } catch (err: any) {
-    // Prisma unique constraint error
     if (err.code === "P2002") {
       throw new AppError("Email already exists", 409);
     }
