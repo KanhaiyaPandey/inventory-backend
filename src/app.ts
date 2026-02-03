@@ -3,6 +3,7 @@ import { requestLogger } from "./middlewares/requestLogger";
 import { errorHandler } from "./middlewares/errorHandler";
 import v1Router from "./routes/v1";
 import { sessionMiddleware } from "./config/session";
+import { attachUser } from "./middlewares/attachUser";
 
 const app = express();
 
@@ -10,7 +11,7 @@ app.use(express.json());
 app.use(requestLogger);
 
 app.use(sessionMiddleware);
-
+app.use(attachUser);
 
 // API v1
 app.use("/api/v1", v1Router);
