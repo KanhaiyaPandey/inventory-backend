@@ -1,18 +1,24 @@
 import { Request, Response, NextFunction } from "express";
-import { ZodSchema } from "zod";
+import { ZodTypeAny } from "zod";
 import { AppError } from "../utils/AppError";
 
 export const validateRequest =
-  (schema: ZodSchema) =>
+  (schema: ZodTypeAny) =>
   (req: Request, _res: Response, next: NextFunction) => {
     try {
-      schema.parse({
+      const parsed = schema.parse({
         body: req.body,
         params: req.params,
         query: req.query,
       });
+      (req as Request & { validated?: unknown }).validated = parsed;
       next();
     } catch (err: any) {
-      next(new AppError(err.errors?.[0]?.message || "Invalid request", 400));
+      const message =
+        err?.issues?.[0]?.message ||
+        err?.errors?.[0]?.message ||
+        err?.message ||
+        "Invalid request";
+      next(new AppError(message, 400));
     }
   };
