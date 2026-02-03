@@ -1,0 +1,18 @@
+node_modules
+/dist
+/build
+/generated
+coverage
+
+# Environment
+.env
+.env.*
+
+# Lockfiles
+package-lock.json
+
+# Logs
+*.log
+
+# Misc
+.DS_Store
