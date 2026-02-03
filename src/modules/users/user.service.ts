@@ -49,6 +49,8 @@ export const createUser = async (data: {
   }
 };
 
+import { getOrSetCache } from "../../utils/cache";
+
 export const listUsers = async (params: {
   page?: number;
   limit?: number;
@@ -60,38 +62,49 @@ export const listUsers = async (params: {
   const search = params.search;
   const role = params.role;
 
-  const where: any = {};
+  const cacheKey = `users:${JSON.stringify({
+    page,
+    limit,
+    search,
+    role,
+  })}`;
 
-  if (search) {
-    where.OR = [
-      { email: { contains: search, mode: "insensitive" } },
-      { name: { contains: search, mode: "insensitive" } },
-    ];
-  }
+  return getOrSetCache(cacheKey, 30, async () => {
+    console.log("🔵 DB QUERY → users list");
 
-  if (role) {
-    where.role = role;
-  }
+    const where: any = {};
 
-  const skip = (page - 1) * limit;
+    if (search) {
+      where.OR = [
+        { email: { contains: search, mode: "insensitive" } },
+        { name: { contains: search, mode: "insensitive" } },
+      ];
+    }
 
-  const [users, total] = await prisma.$transaction([
-    prisma.user.findMany({
-      where,
-      skip,          // ✅ always a number
-      take: limit,   // ✅ always a number
-      orderBy: { createdAt: "desc" },
-    }),
-    prisma.user.count({ where }),
-  ]);
+    if (role) {
+      where.role = role;
+    }
 
-  return {
-    data: users.map(toPublicUser),
-    meta: {
-      page,
-      limit,
-      total,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await prisma.$transaction([
+      prisma.user.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+      }),
+      prisma.user.count({ where }),
+    ]);
+
+    return {
+      data: users.map(toPublicUser),
+      meta: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  });
 };
