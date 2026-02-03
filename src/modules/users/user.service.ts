@@ -41,3 +41,50 @@ export const createUser = async (data: {
     throw err;
   }
 };
+
+export const listUsers = async (params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: "ADMIN" | "STAFF" | "USER";
+}) => {
+  const page = params.page ?? 1;
+  const limit = params.limit ?? 10;
+  const search = params.search;
+  const role = params.role;
+
+  const where: any = {};
+
+  if (search) {
+    where.OR = [
+      { email: { contains: search, mode: "insensitive" } },
+      { name: { contains: search, mode: "insensitive" } },
+    ];
+  }
+
+  if (role) {
+    where.role = role;
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [users, total] = await prisma.$transaction([
+    prisma.user.findMany({
+      where,
+      skip,          // ✅ always a number
+      take: limit,   // ✅ always a number
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.user.count({ where }),
+  ]);
+
+  return {
+    data: users.map(toPublicUser),
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};

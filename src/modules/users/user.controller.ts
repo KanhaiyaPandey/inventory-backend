@@ -39,3 +39,12 @@ export const createUser = async (
     next(err);
   }
 };
+
+export const listUsers = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await userService.listUsers(req.query);
+    res.json(result);
+  } catch (err) {
+    next(err);
+  }
+};

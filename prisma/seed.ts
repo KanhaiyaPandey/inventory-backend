@@ -1,4 +1,5 @@
 import "dotenv/config";
+import bcrypt from "bcrypt";
 import { PrismaClient } from "../generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
 
@@ -10,29 +11,35 @@ const prisma = new PrismaClient({
   adapter,
 });
 
+
 async function main() {
-  await prisma.user.createMany({
-    data: [
-      {
-        email: "admin@test.com",
-        name: "Admin",
-        role: "ADMIN",
-      },
-      {
-        email: "staff@test.com",
-        name: "Staff",
-        role: "STAFF",
-      },
-    ],
-    skipDuplicates: true,
+  const password = await bcrypt.hash("supersecret123", 10);
+
+  await prisma.user.upsert({
+    where: { email: "admin@test.com" },
+    update: {},
+    create: {
+      email: "admin@test.com",
+      name: "Admin",
+      role: "ADMIN",
+      password,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: "final@test.com" },
+    update: {},
+    create: {
+      email: "final@test.com",
+      name: "User",
+      role: "USER",
+      password,
+    },
   });
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect();
-    console.log("🌱 Database seeded");
-  })
+  .then(() => prisma.$disconnect())
   .catch(async (e) => {
     console.error(e);
     await prisma.$disconnect();
