@@ -18,3 +18,40 @@ export const logAudit = async (data: AuditInput) => {
     console.error("Audit log failed:", err);
   }
 };
+
+
+export const listAuditLogs = async (params: {
+  page: number;
+  limit: number;
+  action?: string;
+  actorId?: string;
+}) => {
+  const { page, limit, action, actorId } = params;
+
+  const where: any = {};
+
+  if (action) where.action = action;
+  if (actorId) where.actorId = actorId;
+
+  const skip = (page - 1) * limit;
+
+  const [logs, total] = await prisma.$transaction([
+    prisma.auditLog.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.auditLog.count({ where }),
+  ]);
+
+  return {
+    data: logs,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
