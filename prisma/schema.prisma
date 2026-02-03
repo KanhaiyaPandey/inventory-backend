@@ -17,6 +17,16 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model AuditLog {
+  id          String   @id @default(uuid())
+  actorId     String?
+  action      String
+  resource    String
+  resourceId  String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+}
+
 enum Role {
   ADMIN
   STAFF

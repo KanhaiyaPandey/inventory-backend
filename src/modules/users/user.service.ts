@@ -2,6 +2,7 @@ import { prisma } from "../../config/prisma";
 import { AppError } from "../../utils/AppError";
 import bcrypt from "bcrypt";
 import { toPublicUser } from "./user.mapper";
+import { logAudit } from "../audit/audit.service";
 
 
 export const getUsers = async () => {
@@ -34,6 +35,12 @@ export const createUser = async (data: {
         password: hashedPassword,
         role: data.role ?? "USER",
       },
+    });
+    await logAudit({
+      actorId: user.id,
+      action: "USER_CREATED",
+      resource: "USER",
+      resourceId: user.id,
     });
     return toPublicUser(user);
   } catch (err: any) {

@@ -16,6 +16,7 @@ app.use(attachUser);
 // API v1
 app.use("/api/v1", v1Router);
 
+
 app.get("/health", (_req, res) => {
   res.status(200).json({ status: "ok" });
 });
