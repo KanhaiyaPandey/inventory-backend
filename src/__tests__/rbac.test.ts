@@ -1,29 +1,34 @@
 import request from "supertest";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
+
+vi.mock("../middlewares/attachUser", () => ({
+  attachUser: (req: any, _res: any, next: any) => {
+    const header = req.headers["x-test-role"];
+    const role = Array.isArray(header) ? header[0] : header;
+    if (role) {
+      req.user = { id: "user-1", role };
+    }
+    next();
+  },
+}));
+
 import app from "../app";
+import { patchListen } from "./patchListen";
+
+patchListen(app);
 
 describe("RBAC", () => {
   it("should allow ADMIN to access users", async () => {
-    const agent = request.agent(app);
-
-    await agent.post("/api/v1/auth/login").send({
-      email: "admin@test.com",
-      password: "supersecret123",
-    });
-
-    const res = await agent.get("/api/v1/users");
+    const res = await request(app)
+      .get("/api/v1/users")
+      .set("x-test-role", "ADMIN");
     expect(res.status).toBe(200);
   });
 
   it("should block USER from accessing users", async () => {
-    const agent = request.agent(app);
-
-    await agent.post("/api/v1/auth/login").send({
-      email: "final@test.com",
-      password: "supersecret123",
-    });
-
-    const res = await agent.get("/api/v1/users");
+    const res = await request(app)
+      .get("/api/v1/users")
+      .set("x-test-role", "USER");
     expect(res.status).toBe(403);
   });
 });

@@ -1,6 +1,9 @@
 import request from "supertest";
 import { describe, it, expect } from "vitest";
 import app from "../app";
+import { patchListen } from "./patchListen";
+
+patchListen(app);
 
 describe("Auth flow", () => {
   it("should login successfully and set session cookie", async () => {

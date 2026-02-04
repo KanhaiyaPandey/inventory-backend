@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
+import { patchListen } from "./patchListen";
 
 vi.mock("../config/prisma", () => {
   const prisma = {
@@ -29,6 +30,8 @@ vi.mock("../middlewares/attachUser", () => ({
 
 import app from "../app";
 import { prisma } from "../config/prisma";
+
+patchListen(app);
 
 const prismaMock = prisma as unknown as {
   user: { findMany: ReturnType<typeof vi.fn>; count: ReturnType<typeof vi.fn> };

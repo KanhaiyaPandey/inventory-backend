@@ -5,6 +5,7 @@ vi.mock("../config/prisma", () => {
   const prisma = {
     auditLog: {
       findMany: vi.fn(),
+      count: vi.fn(),
     },
     user: {
       findMany: vi.fn(),
@@ -28,10 +29,13 @@ vi.mock("../middlewares/attachUser", () => ({
 }));
 
 import app from "../app";
+import { patchListen } from "./patchListen";
+
+patchListen(app);
 import { prisma } from "../config/prisma";
 
 const prismaMock = prisma as unknown as {
-  auditLog: { findMany: ReturnType<typeof vi.fn> };
+  auditLog: { findMany: ReturnType<typeof vi.fn>; count: ReturnType<typeof vi.fn> };
 };
 
 beforeEach(() => {
@@ -63,6 +67,7 @@ describe("GET /api/v1/audit-logs", () => {
     ];
 
     prismaMock.auditLog.findMany.mockResolvedValue(logs);
+    prismaMock.auditLog.count.mockResolvedValue(logs.length);
 
     const res = await request(app)
       .get("/api/v1/audit-logs")
@@ -70,10 +75,12 @@ describe("GET /api/v1/audit-logs", () => {
       .expect(200);
 
     expect(prismaMock.auditLog.findMany).toHaveBeenCalledWith({
+      where: {},
+      skip: 0,
+      take: 20,
       orderBy: { createdAt: "desc" },
-      take: 50,
     });
-    expect(res.body[0].id).toBe("log-1");
-    expect(res.body[0].action).toBe("CREATE");
+    expect(res.body.data[0].id).toBe("log-1");
+    expect(res.body.data[0].action).toBe("CREATE");
   });
 });
