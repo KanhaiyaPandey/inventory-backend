@@ -9,6 +9,4 @@ export const listAuditLogsSchema = z.object({
   }),
 });
 
-export type ListAuditLogsQuery = z.infer<
-  typeof listAuditLogsSchema
->["query"];
+export type ListAuditLogsQuery = z.infer<typeof listAuditLogsSchema>["query"];

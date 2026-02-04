@@ -4,7 +4,6 @@ import bcrypt from "bcrypt";
 import { toPublicUser } from "./user.mapper";
 import { logAudit } from "../audit/audit.service";
 
-
 export const getUsers = async () => {
   const users = await prisma.user.findMany({
     orderBy: { createdAt: "desc" },

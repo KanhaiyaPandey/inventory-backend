@@ -1,30 +1,19 @@
 import crypto from "crypto";
 import { prisma } from "../../config/prisma";
-import {
-  verifyRefreshToken,
-  signAccessToken,
-  signRefreshToken,
-} from "../../utils/jwt";
+import { verifyRefreshToken, signAccessToken, signRefreshToken } from "../../utils/jwt";
 import { AppError } from "../../utils/AppError";
 import { NextFunction, Request, Response } from "express";
 
 /**
  * POST /api/v1/auth/mobile/refresh
  */
-export const refreshToken = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { refreshToken } = req.body;
 
     const payload = verifyRefreshToken(refreshToken);
 
-    const hash = crypto
-      .createHash("sha256")
-      .update(refreshToken)
-      .digest("hex");
+    const hash = crypto.createHash("sha256").update(refreshToken).digest("hex");
 
     const stored = await prisma.refreshToken.findFirst({
       where: {
@@ -47,10 +36,7 @@ export const refreshToken = async (
     const newAccessToken = signAccessToken(payload.sub);
     const newRefreshToken = signRefreshToken(payload.sub);
 
-    const newHash = crypto
-      .createHash("sha256")
-      .update(newRefreshToken)
-      .digest("hex");
+    const newHash = crypto.createHash("sha256").update(newRefreshToken).digest("hex");
 
     await prisma.refreshToken.create({
       data: {

@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import * as userService from "./user.service";
 
-export const getUsers = async (
-  _req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getUsers = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const users = await userService.getUsers();
     res.status(200).json(users);
@@ -14,11 +10,7 @@ export const getUsers = async (
   }
 };
 
-export const getUserById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const getUserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = (req as Request & { validated?: any }).validated;
     const id = validated?.params?.id ?? req.params.id;
@@ -29,11 +21,7 @@ export const getUserById = async (
   }
 };
 
-export const createUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const validated = (req as Request & { validated?: any }).validated;
     const body = validated?.body ?? req.body;

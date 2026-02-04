@@ -3,8 +3,7 @@ import { ZodTypeAny } from "zod";
 import { AppError } from "../utils/AppError";
 
 export const validateRequest =
-  (schema: ZodTypeAny) =>
-  (req: Request, _res: Response, next: NextFunction) => {
+  (schema: ZodTypeAny) => (req: Request, _res: Response, next: NextFunction) => {
     try {
       const parsed = schema.parse({
         body: req.body,
@@ -15,10 +14,7 @@ export const validateRequest =
       next();
     } catch (err: any) {
       const message =
-        err?.issues?.[0]?.message ||
-        err?.errors?.[0]?.message ||
-        err?.message ||
-        "Invalid request";
+        err?.issues?.[0]?.message || err?.errors?.[0]?.message || err?.message || "Invalid request";
       next(new AppError(message, 400));
     }
   };

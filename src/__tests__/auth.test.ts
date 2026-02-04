@@ -19,12 +19,10 @@ describe("Auth flow", () => {
   });
 
   it("should login successfully and set session cookie", async () => {
-    const res = await request(app)
-      .post("/api/v1/auth/login")
-      .send({
-        email: "final@test.com",
-        password: "supersecret123",
-      });
+    const res = await request(app).post("/api/v1/auth/login").send({
+      email: "final@test.com",
+      password: "supersecret123",
+    });
 
     expect(res.status).toBe(200);
     expect(res.headers["set-cookie"]).toBeDefined();

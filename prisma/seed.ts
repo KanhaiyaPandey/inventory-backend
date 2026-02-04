@@ -1,4 +1,3 @@
-
 import bcrypt from "bcrypt";
 import { PrismaClient } from "../generated/prisma";
 import { PrismaPg } from "@prisma/adapter-pg";
@@ -11,7 +10,6 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({
   adapter,
 });
-
 
 async function main() {
   const password = await bcrypt.hash("supersecret123", 10);

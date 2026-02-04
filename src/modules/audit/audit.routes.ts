@@ -6,11 +6,6 @@ import { listAuditLogs } from "./audit.controller";
 
 const router = Router();
 
-router.get(
-  "/",
-  requireRole(["ADMIN"]),
-  validateRequest(listAuditLogsSchema),
-  listAuditLogs
-);
+router.get("/", requireRole(["ADMIN"]), validateRequest(listAuditLogsSchema), listAuditLogs);
 
 export default router;

@@ -1,31 +1,16 @@
 import { Router } from "express";
-import { getUsers, getUserById, createUser, listUsers } from "./user.controller";
+import { getUserById, createUser, listUsers } from "./user.controller";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { createUserSchema, getUserByIdSchema, listUsersSchema } from "./user.schemas";
-import { requireAuth } from "../../middlewares/requireAuth";
 import { requireRole } from "../../middlewares/requireRole";
 
 const router = Router();
 
+router.get("/", requireRole(["ADMIN"]), validateRequest(listUsersSchema), listUsers);
 
-router.get(
-  "/",
-  requireRole(["ADMIN"]),
-  validateRequest(listUsersSchema),
-  listUsers 
-);
+router.get("/:id", validateRequest(getUserByIdSchema), getUserById);
 
-router.get(
-  "/:id",
-  validateRequest(getUserByIdSchema),
-  getUserById
-);
-
-router.post(
-  "/",
-  validateRequest(createUserSchema),
-  createUser
-);
+router.post("/", validateRequest(createUserSchema), createUser);
 
 // router.get(
 //   "/reports",

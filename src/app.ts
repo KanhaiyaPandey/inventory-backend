@@ -14,13 +14,11 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(helmet());
 
-
 app.use(sessionMiddleware);
 app.use(attachUser);
 
 // API v1
 app.use("/api/v1", apiLimiter, v1Router);
-
 
 app.get("/health", async (_req, res) => {
   await prisma.$queryRaw`SELECT 1`;

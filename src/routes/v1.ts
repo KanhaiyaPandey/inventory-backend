@@ -4,7 +4,6 @@ import authRoutes from "../modules/auth/auth.routes";
 import auditRoutes from "../modules/audit/audit.routes";
 import mobileAuthRoutes from "../modules/auth/mobileAuth.routes";
 
-
 const router = Router();
 
 router.use("/users", userRoutes);

@@ -19,16 +19,12 @@ patchListen(app);
 
 describe("RBAC", () => {
   it("should allow ADMIN to access users", async () => {
-    const res = await request(app)
-      .get("/api/v1/users")
-      .set("x-test-role", "ADMIN");
+    const res = await request(app).get("/api/v1/users").set("x-test-role", "ADMIN");
     expect(res.status).toBe(200);
   });
 
   it("should block USER from accessing users", async () => {
-    const res = await request(app)
-      .get("/api/v1/users")
-      .set("x-test-role", "USER");
+    const res = await request(app).get("/api/v1/users").set("x-test-role", "USER");
     expect(res.status).toBe(403);
   });
 });

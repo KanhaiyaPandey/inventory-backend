@@ -1,22 +1,14 @@
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { prisma } from "../../config/prisma";
-import {
-  signAccessToken,
-  signRefreshToken,
-  verifyRefreshToken,
-} from "../../utils/jwt";
+import { signAccessToken, signRefreshToken } from "../../utils/jwt";
 import { AppError } from "../../utils/AppError";
 import { NextFunction, Request, Response } from "express";
 
 /**
  * POST /api/v1/auth/mobile/login
  */
-export const mobileLogin = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const mobileLogin = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
 
@@ -29,10 +21,7 @@ export const mobileLogin = async (
     const accessToken = signAccessToken(user.id);
     const refreshToken = signRefreshToken(user.id);
 
-    const tokenHash = crypto
-      .createHash("sha256")
-      .update(refreshToken)
-      .digest("hex");
+    const tokenHash = crypto.createHash("sha256").update(refreshToken).digest("hex");
 
     await prisma.refreshToken.create({
       data: {

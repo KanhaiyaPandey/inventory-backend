@@ -19,7 +19,6 @@ export const logAudit = async (data: AuditInput) => {
   }
 };
 
-
 export const listAuditLogs = async (params: {
   page: number;
   limit: number;

@@ -1,4 +1,4 @@
 export const toPublicUser = (user: any) => {
-  const { password, ...rest } = user;
+  const { ...rest } = user;
   return rest;
 };
