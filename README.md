@@ -1,61 +1,103 @@
-# inventory-backend
 # Inventory Backend
 
-A production-style **Node.js + TypeScript backend** for an inventory and order management system, designed to demonstrate real-world backend engineering patterns used in modern SaaS and platform teams.
+Production-style Node.js + TypeScript backend that provides a solid foundation for inventory and operations systems. It includes authentication, RBAC, auditing, and a clean, modular service layout to support real-world backend patterns.
 
-This project focuses on **clean architecture, data integrity, performance, and reliability**, rather than frontend concerns or UI.
+**Problem Solved**
+This project standardizes core backend capabilities that inventory or operations platforms typically need: secure access, user management, auditing, and consistent API and validation patterns. It aims to reduce time-to-feature by shipping a stable, extensible base.
 
----
+**Tech Stack**
+- Node.js
+- TypeScript
+- Express
+- PostgreSQL
+- Prisma ORM
+- JSON Web Tokens (JWT)
+- bcrypt (password hashing)
+- Zod (schema validation)
+- express-session (session management)
+- Helmet (security headers)
+- express-rate-limit (basic rate limiting)
+- ioredis (Redis client)
+- Vitest + Supertest (tests)
 
-## 🚀 Tech Stack
+**Key Features**
+- Modular, feature-based routing under `src/modules`
+- JWT access/refresh flow with refresh token rotation
+- Session-based user attachment for server-side flows
+- RBAC middleware (`ADMIN`, `STAFF`, `USER`)
+- Request validation with Zod
+- Centralized error handling and request logging
+- Health check endpoint
+- Audit log module
 
-- **Node.js (v22)**
-- **TypeScript**
-- **Express**
-- **PostgreSQL** (planned)
-- **Prisma ORM** (planned)
-- **Redis** (planned)
-- **BullMQ** (planned)
-- **JWT & Cookie-based Authentication** (planned)
+**Project Structure**
+```text
+.
+├── prisma/
+│   └── schema.prisma
+├── generated/
+│   └── prisma/          # Prisma client output
+├── src/
+│   ├── app.ts           # Express app wiring
+│   ├── server.ts        # App entry point
+│   ├── config/          # env, prisma, redis, session
+│   ├── middlewares/     # auth, rbac, validation, logging, rate-limit
+│   ├── modules/         # feature modules
+│   │   ├── auth/
+│   │   ├── audit/
+│   │   └── users/
+│   ├── routes/          # API version routing
+│   ├── types/           # Express type augmentation
+│   ├── utils/           # shared helpers
+│   └── __tests__/       # vitest tests
+└── tsconfig.json
+```
 
----
+**API Overview**
+- `GET /health`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/logout`
+- `POST /api/v1/auth/mobile/login`
+- `POST /api/v1/auth/mobile/refresh`
+- `GET /api/v1/users`
+- `GET /api/v1/users/:id`
+- `POST /api/v1/users`
+- `GET /api/v1/audit-logs`
 
-## 🎯 Project Goals
-
-This backend is being built to showcase:
-
-- Clean and scalable project structure
-- RESTful API design with proper HTTP semantics
-- Centralized error handling and logging
-- Secure authentication and authorization
-- Robust database schema design
-- Caching strategies for performance
-- Background job processing for async workloads
-- Production-ready backend practices
-
----
-
-## 📁 Project Structure
-
-src/
-├── app.ts          # Express app configuration
-├── server.ts       # Application entry point
-├── config/         # Environment & app configuration
-├── modules/        # Feature-based modules (auth, inventory, orders)
-├── middlewares/    # Custom Express middlewares
-└── utils/          # Shared utilities
-
----
-
-## 🛠️ Getting Started
-
-### Prerequisites
-- Node.js **v22**
-- npm
-
-### Installation
-
+**Setup**
+1. Install dependencies.
 ```bash
-git clone <repo-url>
-cd inventory-backend
 npm install
+```
+2. Configure environment variables.
+Create a `.env` file with at least:
+```bash
+DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DB
+JWT_ACCESS_SECRET=your-access-secret
+JWT_REFRESH_SECRET=your-refresh-secret
+SESSION_SECRET=your-session-secret
+PORT=3000
+NODE_ENV=development
+```
+3. Generate Prisma client.
+```bash
+npx prisma generate
+```
+4. Run database migrations (if you add migrations).
+```bash
+npx prisma migrate dev
+```
+5. Start the server.
+```bash
+npm run dev
+```
+
+**Scripts**
+- `npm run dev` - run locally with ts-node-dev
+- `npm run build` - compile TypeScript to `dist/`
+- `npm start` - run compiled server
+- `npm test` - run vitest suite
+
+**Notes**
+- Prisma schema lives at `prisma/schema.prisma`.
+- The API is mounted under `/api/v1` in `src/routes/v1.ts`.
