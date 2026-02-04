@@ -8,35 +8,47 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  role      Role
-  createdAt DateTime @default(now())
+  id            String         @id @default(uuid())
+  email         String         @unique
+  name          String
+  password      String         @default("TEMP_PASSWORD")
+  role          Role
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  refreshTokens RefreshToken[]
+  auditLogs     AuditLog[]     @relation("UserAuditLogs")
 
   @@index([role])
   @@index([createdAt])
+  @@index([role, createdAt])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([tokenHash])
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model AuditLog {
   id        String   @id @default(uuid())
   actorId   String?
+  actor     User?    @relation("UserAuditLogs", fields: [actorId], references: [id])
   action    String
+  resource  String?
   createdAt DateTime @default(now())
 
   @@index([action])
   @@index([actorId])
   @@index([createdAt])
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  userId    String
-  revoked   Boolean
-  expiresAt DateTime
-
-  @@index([userId])
-  @@index([expiresAt])
 }
 
 enum Role {

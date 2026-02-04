@@ -6,6 +6,7 @@ import { sessionMiddleware } from "./config/session";
 import { attachUser } from "./middlewares/attachUser";
 import helmet from "helmet";
 import { apiLimiter } from "./middlewares/rateLimit";
+import { prisma } from "./config/prisma";
 
 const app = express();
 
@@ -21,7 +22,8 @@ app.use(attachUser);
 app.use("/api/v1", apiLimiter, v1Router);
 
 
-app.get("/health", (_req, res) => {
+app.get("/health", async (_req, res) => {
+  await prisma.$queryRaw`SELECT 1`;
   res.status(200).json({ status: "ok" });
 });
 
