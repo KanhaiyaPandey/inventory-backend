@@ -7,12 +7,16 @@ import {
   verifyRefreshToken,
 } from "../../utils/jwt";
 import { AppError } from "../../utils/AppError";
-import { NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 /**
  * POST /api/v1/auth/mobile/login
  */
-export const mobileLogin = async (req: Request, res: Response, next: NextFunction) => {
+export const mobileLogin = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { email, password } = req.body;
 

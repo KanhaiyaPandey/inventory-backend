@@ -1,6 +1,6 @@
 import { verifyAccessToken } from "../utils/jwt";
 import { AppError } from "../utils/AppError";
-import { NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 export const requireJwt = (req: Request, _res: Response, next: NextFunction) => {
   const auth = req.headers.authorization;

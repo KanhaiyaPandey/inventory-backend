@@ -6,12 +6,16 @@ import {
   signRefreshToken,
 } from "../../utils/jwt";
 import { AppError } from "../../utils/AppError";
-import { NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 
 /**
  * POST /api/v1/auth/mobile/refresh
  */
-export const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const { refreshToken } = req.body;
 
