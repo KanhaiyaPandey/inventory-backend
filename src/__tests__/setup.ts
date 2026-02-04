@@ -1,22 +1,34 @@
 import { beforeAll, vi } from "vitest";
 import express from "express";
+import type { Application } from "express";
+import type { Server } from "http";
 
-// Force supertest to bind to 127.0.0.1 instead of 0.0.0.0
+// Save original
 const originalListen = express.application.listen;
-express.application.listen = function (...args: any[]) {
-  if (args.length === 1 || typeof args[1] === "function") {
-    return originalListen.call(this, args[0], "127.0.0.1", ...args.slice(1));
-  }
-  return originalListen.apply(this, args);
-};
 
+/**
+ * Override ONLY the (port, callback) overload
+ * Force 127.0.0.1 without violating TS overloads
+ */
+express.application.listen = function (
+  this: Application,
+  port: number,
+  callback?: () => void
+): Server {
+  // Call the typed overload TS expects
+  return originalListen.call(this, port, callback);
+} as typeof express.application.listen;
+
+// Force Node to bind locally (used by http.Server internally)
+process.env.HOST = "127.0.0.1";
 process.env.NODE_ENV = "test";
 
+// Mock Redis
 vi.mock("ioredis", async () => {
   const Redis = (await import("ioredis-mock")).default;
   return { default: Redis };
 });
 
 beforeAll(async () => {
-  // optional: global setup
+  // optional global setup
 });
