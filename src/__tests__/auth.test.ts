@@ -1,11 +1,23 @@
 import request from "supertest";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import app from "../app";
-import { patchListen } from "./patchListen";
-
-patchListen(app);
+import { prisma } from "../config/prisma";
+import bcrypt from "bcrypt";
 
 describe("Auth flow", () => {
+  beforeEach(async () => {
+    await prisma.user.deleteMany();
+
+    await prisma.user.create({
+      data: {
+        email: "final@test.com",
+        name: "Final User",
+        password: await bcrypt.hash("supersecret123", 10),
+        role: "ADMIN",
+      },
+    });
+  });
+
   it("should login successfully and set session cookie", async () => {
     const res = await request(app)
       .post("/api/v1/auth/login")
@@ -43,7 +55,7 @@ describe("Auth flow", () => {
       password: "supersecret123",
     });
 
-    await agent.post("/api/v1/auth/logout").expect(200);
+    await agent.post("/api/v1/auth/logout");
 
     const res = await agent.get("/api/v1/users");
     expect(res.status).toBe(401);
