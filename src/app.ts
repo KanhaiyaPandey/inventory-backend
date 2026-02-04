@@ -4,17 +4,21 @@ import { errorHandler } from "./middlewares/errorHandler";
 import v1Router from "./routes/v1";
 import { sessionMiddleware } from "./config/session";
 import { attachUser } from "./middlewares/attachUser";
+import helmet from "helmet";
+import { apiLimiter } from "./middlewares/rateLimit";
 
 const app = express();
 
 app.use(express.json());
 app.use(requestLogger);
+app.use(helmet());
+
 
 app.use(sessionMiddleware);
 app.use(attachUser);
 
 // API v1
-app.use("/api/v1", v1Router);
+app.use("/api/v1", apiLimiter, v1Router);
 
 
 app.get("/health", (_req, res) => {

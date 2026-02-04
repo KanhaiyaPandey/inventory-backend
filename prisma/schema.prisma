@@ -11,32 +11,32 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String
-  password  String   @default("TEMP_PASSWORD")
-  role      Role     @default(USER)
+  role      Role
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  refreshTokens RefreshToken[]
+  @@index([role])
+  @@index([createdAt])
 }
 
 model AuditLog {
-  id         String   @id @default(uuid())
-  actorId    String?
-  action     String
-  resource   String
-  resourceId String?
-  metadata   Json?
-  createdAt  DateTime @default(now())
+  id        String   @id @default(uuid())
+  actorId   String?
+  action    String
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([actorId])
+  @@index([createdAt])
 }
 
 model RefreshToken {
   id        String   @id @default(uuid())
-  tokenHash String
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  revoked   Boolean  @default(false)
-  createdAt DateTime @default(now())
+  revoked   Boolean
   expiresAt DateTime
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 enum Role {
