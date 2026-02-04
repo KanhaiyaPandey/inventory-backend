@@ -22,4 +22,30 @@ describe("Auth flow", () => {
     const res = await request(app).get("/api/v1/users");
     expect(res.status).toBe(401);
   });
+
+  it("persists session across requests", async () => {
+    const agent = request.agent(app);
+
+    await agent.post("/api/v1/auth/login").send({
+      email: "final@test.com",
+      password: "supersecret123",
+    });
+
+    const res = await agent.get("/api/v1/users");
+    expect([200, 403]).toContain(res.status);
+  });
+
+  it("logout invalidates session", async () => {
+    const agent = request.agent(app);
+
+    await agent.post("/api/v1/auth/login").send({
+      email: "final@test.com",
+      password: "supersecret123",
+    });
+
+    await agent.post("/api/v1/auth/logout").expect(200);
+
+    const res = await agent.get("/api/v1/users");
+    expect(res.status).toBe(401);
+  });
 });
