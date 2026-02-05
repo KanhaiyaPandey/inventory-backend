@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import {prisma} from "../src/config/prisma"
+import { prisma } from "../src/config/prisma";
 
 async function main() {
   const password = await bcrypt.hash("supersecret123", 10);
